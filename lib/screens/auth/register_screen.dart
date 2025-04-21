@@ -23,6 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _dbHelper = DatabaseHelper.instance;
   late UserHelper _userHelper;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -129,10 +130,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _register,
-                  child: const Text('Register'),
-                ),
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: _register,
+                        child: const Text('Register'),
+                      ),
                 TextButton(
                   onPressed: () {
                     Navigator.pushReplacement(
@@ -152,6 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
       final user = User(
         fullName: _fullNameController.text,
         email: _emailController.text,
@@ -168,6 +172,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Email already registered')),
         );
+        setState(() => _isLoading = false);
         return;
       }
 
@@ -183,6 +188,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
+      setState(() => _isLoading = false);
     }
   }
 

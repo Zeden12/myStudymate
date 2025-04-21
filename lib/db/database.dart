@@ -1,5 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'helpers/user_helper.dart';
+import 'helpers/task_helper.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -55,4 +57,7 @@ class DatabaseHelper {
     final db = await instance.database;
     db.close();
   }
+
+  UserHelper get userHelper => UserHelper(this);
+  TaskHelper get taskHelper => TaskHelper(this);
 }
