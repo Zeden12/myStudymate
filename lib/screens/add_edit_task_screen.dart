@@ -5,7 +5,6 @@ import 'package:mystudymate/db/helpers/task_helper.dart';
 import 'package:mystudymate/db/helpers/notification_helper.dart';
 import 'package:mystudymate/db/helpers/user_helper.dart';
 import 'package:mystudymate/db/database.dart';
-import 'package:mystudymate/models/notification_model.dart';
 
 class AddEditTaskScreen extends StatefulWidget {
   final int userId;

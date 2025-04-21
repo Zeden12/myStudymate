@@ -48,9 +48,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _personalTasks = await _taskHelper.getPersonalTasks(widget.user.id!);
       _assignedTasks = await _taskHelper.getAssignedTasks(
         widget.user.id!,
-        widget.user.school!,
-        widget.user.department!,
-        widget.user.level!,
+        widget.user.school,
+        widget.user.department,
+        widget.user.level,
       );
     } else {
       _lecturerTasks = await _taskHelper.getAssignedTasksByLecturer(widget.user.id!);
