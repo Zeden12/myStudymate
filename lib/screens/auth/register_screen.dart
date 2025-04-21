@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 Center(
                   child: Text(
-                    'Create Your Account',
+                    'Join StudyMate & Stay Ahead! 🎓',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green[800]),
                   ),
                 ),
@@ -119,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           onPressed: _register,
-                          child: const Text('Register', style: TextStyle(fontSize: 18)),
+                          child: const Text('Register', style: TextStyle(fontSize: 18, color: Colors.white)),
                         ),
                       ),
                 const SizedBox(height: 16),
