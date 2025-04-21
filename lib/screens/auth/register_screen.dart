@@ -3,6 +3,7 @@ import 'package:mystudymate/db/helpers/user_helper.dart';
 import 'package:mystudymate/db/database.dart';
 import 'package:mystudymate/models/user_model.dart';
 import 'package:mystudymate/screens/auth/login_screen.dart';
+import 'package:mystudymate/screens/home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -23,7 +24,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _dbHelper = DatabaseHelper.instance;
   late UserHelper _userHelper;
+  String _selectedRole = 'student';
   bool _isLoading = false;
+
+  final List<String> _schools = ['School of Engineering', 'School of Medicine', 'School of Arts'];
+  final List<String> _departments = ['Computer Science', 'Electrical Engineering', 'Mechanical Engineering'];
+  final List<String> _levels = ['100', '200', '300', '400'];
 
   @override
   void initState() {
@@ -34,7 +40,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('StudyMate - Register')),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('StudyMate Pro - Register'),
+        backgroundColor: Colors.green[700],
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -44,7 +55,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 TextFormField(
                   controller: _fullNameController,
-                  decoration: const InputDecoration(labelText: 'Full Name'),
+                  decoration: InputDecoration(
+                    labelText: 'Full Name',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your full name';
@@ -52,9 +68,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
+                SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                  ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -66,44 +88,99 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
+                SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneController,
-                  decoration: const InputDecoration(labelText: 'Phone (optional)'),
+                  decoration: InputDecoration(
+                    labelText: 'Phone (optional)',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                  ),
                   keyboardType: TextInputType.phone,
                 ),
-                TextFormField(
-                  controller: _schoolController,
-                  decoration: const InputDecoration(labelText: 'School'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your school';
-                    }
-                    return null;
-                  },
+                SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _selectedRole,
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'student',
+                      child: Text('Student'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'lecturer',
+                      child: Text('Lecturer'),
+                    ),
+                  ],
+                  decoration: InputDecoration(
+                    labelText: 'Role',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                  ),
+                  onChanged: (value) => setState(() => _selectedRole = value!),
                 ),
-                TextFormField(
-                  controller: _departmentController,
-                  decoration: const InputDecoration(labelText: 'Department'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your department';
-                    }
-                    return null;
-                  },
+                SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _schools.first,
+                  items: _schools.map((school) {
+                    return DropdownMenuItem(
+                      value: school,
+                      child: Text(school),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'School',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                  ),
+                  onChanged: (value) => _schoolController.text = value!,
                 ),
-                TextFormField(
-                  controller: _levelController,
-                  decoration: const InputDecoration(labelText: 'Level'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your level';
-                    }
-                    return null;
-                  },
+                SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _departments.first,
+                  items: _departments.map((dept) {
+                    return DropdownMenuItem(
+                      value: dept,
+                      child: Text(dept),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Department',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                  ),
+                  onChanged: (value) => _departmentController.text = value!,
                 ),
+                SizedBox(height: 16),
+                if (_selectedRole == 'student')
+                  DropdownButtonFormField<String>(
+                    value: _levels.first,
+                    items: _levels.map((level) {
+                      return DropdownMenuItem(
+                        value: level,
+                        child: Text('Level $level'),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'Level',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.green[50],
+                    ),
+                    onChanged: (value) => _levelController.text = value!,
+                  ),
+                SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                  ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -115,9 +192,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
+                SizedBox(height: 16),
                 TextFormField(
                   controller: _confirmPasswordController,
-                  decoration: const InputDecoration(labelText: 'Confirm Password'),
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                  ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -129,13 +212,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 24),
                 _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _register,
-                        child: const Text('Register'),
-                      ),
+                    ? CircularProgressIndicator()
+                    : SizedBox(height: 24),
+_isLoading
+    ? CircularProgressIndicator()
+    : SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green[700],  // Fixed color value
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: _register,
+          child: Text(
+            'Register',
+            style: TextStyle(fontSize: 18),
+          ),
+        ),
+      ),
+SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
                     Navigator.pushReplacement(
@@ -143,7 +243,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       MaterialPageRoute(builder: (context) => const LoginScreen()),
                     );
                   },
-                  child: const Text('Already have an account? Login'),
+                  child: Text(
+                    'Already have an account? Login',
+                    style: TextStyle(color: Colors.green[700]),
+                  ),
                 ),
               ],
             ),
@@ -156,6 +259,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
+      
       final user = User(
         fullName: _fullNameController.text,
         email: _emailController.text,
@@ -164,31 +268,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
         department: _departmentController.text,
         level: _levelController.text,
         password: _passwordController.text,
+        role: _selectedRole,
       );
 
-      // Check if email already exists
       final existingUser = await _userHelper.getUserByEmail(user.email);
       if (existingUser != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email already registered')),
+          SnackBar(
+            content: Text('Email already registered'),
+            backgroundColor: Colors.red,
+          ),
         );
         setState(() => _isLoading = false);
         return;
       }
 
-      // Insert new user
       await _userHelper.insertUser(user);
 
-      // Show success message and navigate to login
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful! Please login')),
+        SnackBar(
+          content: Text('Registration successful! Please login'),
+          backgroundColor: Colors.green,
+        ),
       );
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
-      setState(() => _isLoading = false);
     }
   }
 

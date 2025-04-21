@@ -3,20 +3,22 @@ class User {
   final String fullName;
   final String email;
   final String? phone;
-  final String? school;
-  final String? department;
-  final String? level;
+  final String school;
+  final String department;
+  final String level;
   final String password;
+  final String role; // 'student' or 'lecturer'
 
   User({
     this.id,
     required this.fullName,
     required this.email,
     this.phone,
-    this.school,
-    this.department,
-    this.level,
+    required this.school,
+    required this.department,
+    required this.level,
     required this.password,
+    required this.role,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class User {
       'department': department,
       'level': level,
       'password': password,
+      'role': role,
     };
   }
 
@@ -42,6 +45,7 @@ class User {
       department: map['department'],
       level: map['level'],
       password: map['password'],
+      role: map['role'],
     );
   }
 }

@@ -1,7 +1,8 @@
+import 'package:mystudymate/db/helpers/notification_helper.dart';
+import 'package:mystudymate/db/helpers/task_helper.dart';
+import 'package:mystudymate/db/helpers/user_helper.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'helpers/user_helper.dart';
-import 'helpers/task_helper.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -11,7 +12,7 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('studymate.db');
+    _database = await _initDB('studymate_pro.db');
     return _database!;
   }
 
@@ -19,27 +20,35 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: _createDB,
+      onConfigure: (db) async {
+        await db.execute('PRAGMA foreign_keys = ON');
+      },
+    );
   }
 
   Future _createDB(Database db, int version) async {
-    // Create users table
-    await db.execute('''
-      CREATE TABLE users (
+    // Batch execute all table creations
+    final batch = db.batch();
+    
+    batch.execute('''
+      CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         fullName TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         phone TEXT,
-        school TEXT,
-        department TEXT,
-        level TEXT,
-        password TEXT NOT NULL
-      )
+        school TEXT NOT NULL,
+        department TEXT NOT NULL,
+        level TEXT NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL CHECK(role IN ('student', 'lecturer'))
     ''');
 
-    // Create tasks table
-    await db.execute('''
-      CREATE TABLE tasks (
+    batch.execute('''
+      CREATE TABLE IF NOT EXISTS tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userId INTEGER NOT NULL,
         title TEXT NOT NULL,
@@ -48,9 +57,26 @@ class DatabaseHelper {
         module TEXT,
         deadline TEXT,
         isCompleted INTEGER DEFAULT 0,
-        FOREIGN KEY (userId) REFERENCES users (id)
-      )
+        isAssigned INTEGER DEFAULT 0,
+        assignedSchool TEXT,
+        assignedDepartment TEXT,
+        assignedLevel TEXT,
+        FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE)
     ''');
+
+    batch.execute('''
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER NOT NULL,
+        taskId INTEGER NOT NULL,
+        message TEXT NOT NULL,
+        isRead INTEGER DEFAULT 0,
+        createdAt TEXT NOT NULL,
+        FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
+        FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE)
+    ''');
+
+    await batch.commit();
   }
 
   Future close() async {
@@ -60,4 +86,5 @@ class DatabaseHelper {
 
   UserHelper get userHelper => UserHelper(this);
   TaskHelper get taskHelper => TaskHelper(this);
+  NotificationHelper get notificationHelper => NotificationHelper(this);
 }

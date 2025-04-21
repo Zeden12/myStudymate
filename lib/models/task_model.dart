@@ -7,6 +7,10 @@ class Task {
   final String? module;
   final DateTime? deadline;
   final bool isCompleted;
+  final bool isAssigned;
+  final String? assignedSchool;
+  final String? assignedDepartment;
+  final String? assignedLevel;
 
   Task({
     this.id,
@@ -17,6 +21,10 @@ class Task {
     this.module,
     this.deadline,
     this.isCompleted = false,
+    this.isAssigned = false,
+    this.assignedSchool,
+    this.assignedDepartment,
+    this.assignedLevel,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +37,10 @@ class Task {
       'module': module,
       'deadline': deadline?.toIso8601String(),
       'isCompleted': isCompleted ? 1 : 0,
+      'isAssigned': isAssigned ? 1 : 0,
+      'assignedSchool': assignedSchool,
+      'assignedDepartment': assignedDepartment,
+      'assignedLevel': assignedLevel,
     };
   }
 
@@ -42,6 +54,10 @@ class Task {
       module: map['module'],
       deadline: map['deadline'] != null ? DateTime.parse(map['deadline']) : null,
       isCompleted: map['isCompleted'] == 1,
+      isAssigned: map['isAssigned'] == 1,
+      assignedSchool: map['assignedSchool'],
+      assignedDepartment: map['assignedDepartment'],
+      assignedLevel: map['assignedLevel'],
     );
   }
 }

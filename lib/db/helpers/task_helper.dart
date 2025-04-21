@@ -11,40 +11,36 @@ class TaskHelper {
     return await db.insert('tasks', task.toMap());
   }
 
-  Future<List<Task>> getTasksByUser(int userId) async {
+  Future<List<Task>> getPersonalTasks(int userId) async {
     final db = await dbHelper.database;
     final result = await db.query(
       'tasks',
-      where: 'userId = ?',
+      where: 'userId = ? AND isAssigned = 0',
       whereArgs: [userId],
       orderBy: 'deadline ASC',
     );
-
     return result.map((map) => Task.fromMap(map)).toList();
   }
 
-  Future<List<Task>> getUpcomingTasks(int userId) async {
+  Future<List<Task>> getAssignedTasks(int userId, String school, String department, String level) async {
     final db = await dbHelper.database;
-    final now = DateTime.now().toIso8601String();
     final result = await db.query(
       'tasks',
-      where: 'userId = ? AND deadline >= ? AND isCompleted = 0',
-      whereArgs: [userId, now],
+      where: 'isAssigned = 1 AND assignedSchool = ? AND assignedDepartment = ? AND assignedLevel = ?',
+      whereArgs: [school, department, level],
       orderBy: 'deadline ASC',
     );
-
     return result.map((map) => Task.fromMap(map)).toList();
   }
 
-  Future<List<Task>> getCompletedTasks(int userId) async {
+  Future<List<Task>> getAssignedTasksByLecturer(int userId) async {
     final db = await dbHelper.database;
     final result = await db.query(
       'tasks',
-      where: 'userId = ? AND isCompleted = 1',
+      where: 'userId = ? AND isAssigned = 1',
       whereArgs: [userId],
-      orderBy: 'deadline DESC',
+      orderBy: 'deadline ASC',
     );
-
     return result.map((map) => Task.fromMap(map)).toList();
   }
 
