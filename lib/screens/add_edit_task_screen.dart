@@ -45,9 +45,9 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   bool _isLoading = false;
 
   // Dropdown options
-  final List<String> _schools = ['School of Engineering', 'School of Medicine', 'School of Arts'];
-  final List<String> _departments = ['Computer Science', 'Electrical Engineering', 'Mechanical Engineering'];
-  final List<String> _levels = ['100', '200', '300', '400'];
+  final List<String> _schools = ['school of ICT','School of Engineering', 'School of science', 'School of Mining & Geology', 'School of Architecture'];
+  final List<String> _departments = ['IS','CS', 'IT', 'CSE', 'SE', 'CE', 'EE', 'ME', 'AE', 'CEG', 'CIVIL', 'ARCHITECTURE'];
+  final List<String> _levels = ['1', '2', '3', '4'];
 
   @override
   void initState() {
