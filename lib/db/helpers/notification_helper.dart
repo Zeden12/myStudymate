@@ -45,14 +45,15 @@ class NotificationHelper {
   Future<void> createAssignmentNotifications(int taskId, String title, List<User> students) async {
     final db = await dbHelper.database;
     final batch = db.batch();
+    final now = DateTime.now().toIso8601String();
     
     for (final student in students) {
       batch.insert('notifications', {
-        'userId': student.id,
+        'userId': student.id!,
         'taskId': taskId,
         'message': 'New assignment: $title',
         'isRead': 0,
-        'createdAt': DateTime.now().toIso8601String(),
+        'createdAt': now,
       });
     }
     

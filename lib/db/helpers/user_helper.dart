@@ -32,12 +32,17 @@ class UserHelper {
   }
 
   Future<List<User>> getStudentsByCriteria(String school, String department, String level) async {
-    final db = await dbHelper.database;
-    final result = await db.query(
-      'users',
-      where: 'role = ? AND school = ? AND department = ? AND level = ?',
-      whereArgs: ['student', school, department, level],
-    );
-    return result.map((map) => User.fromMap(map)).toList();
-  }
+  final db = await dbHelper.database;
+  final result = await db.query(
+    'users',
+    where: 'role = ? AND school = ? AND department = ? AND level = ?',
+    whereArgs: [
+      'student', 
+      school.trim(), 
+      department.trim(), 
+      level.trim()
+    ],
+  );
+  return result.map((map) => User.fromMap(map)).toList();
+}
 }

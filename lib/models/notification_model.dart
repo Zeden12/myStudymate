@@ -3,7 +3,7 @@ class Notification {
   final int userId;
   final int taskId;
   final String message;
-  final String createdAt;
+  final DateTime createdAt;
   final bool isRead;
 
   Notification({
@@ -11,20 +11,9 @@ class Notification {
     required this.userId,
     required this.taskId,
     required this.message,
-    required this.createdAt,
+    DateTime? createdAt,
     this.isRead = false,
-  });
-
-  factory Notification.fromMap(Map<String, dynamic> map) {
-    return Notification(
-      id: map['id'],
-      userId: map['userId'],
-      taskId: map['taskId'],
-      message: map['message'],
-      createdAt: map['createdAt'],
-      isRead: map['isRead'] == 1,
-    );
-  }
+  }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
     return {
@@ -32,8 +21,43 @@ class Notification {
       'userId': userId,
       'taskId': taskId,
       'message': message,
-      'createdAt': createdAt,
+      'createdAt': createdAt.toIso8601String(),
       'isRead': isRead ? 1 : 0,
     };
+  }
+
+  factory Notification.fromMap(Map<String, dynamic> map) {
+    return Notification(
+      id: map['id'],
+      userId: map['userId'],
+      taskId: map['taskId'],
+      message: map['message'],
+      createdAt: DateTime.parse(map['createdAt']),
+      isRead: map['isRead'] == 1,
+    );
+  }
+
+  Notification copyWith({
+    int? id,
+    int? userId,
+    int? taskId,
+    String? message,
+    DateTime? createdAt,
+    bool? isRead,
+  }) {
+    return Notification(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      taskId: taskId ?? this.taskId,
+      message: message ?? this.message,
+      createdAt: createdAt ?? this.createdAt,
+      isRead: isRead ?? this.isRead,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Notification(id: $id, userId: $userId, taskId: $taskId, '
+           'message: $message, createdAt: $createdAt, isRead: $isRead)';
   }
 }

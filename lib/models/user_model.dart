@@ -7,7 +7,7 @@ class User {
   final String department;
   final String level;
   final String password;
-  final String role; // 'student' or 'lecturer'
+  final String role; // Consider enum
 
   User({
     this.id,
@@ -21,17 +21,42 @@ class User {
     required this.role,
   });
 
+  // Add copyWith
+  User copyWith({
+    int? id,
+    String? fullName,
+    String? email,
+    String? phone,
+    String? school,
+    String? department,
+    String? level,
+    String? password,
+    String? role,
+  }) {
+    return User(
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      school: school ?? this.school,
+      department: department ?? this.department,
+      level: level ?? this.level,
+      password: password ?? this.password,
+      role: role ?? this.role,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'fullName': fullName,
-      'email': email,
-      'phone': phone,
-      'school': school,
-      'department': department,
-      'level': level,
-      'password': password,
-      'role': role,
+      'fullName': fullName.trim(),
+      'email': email.trim(),
+      'phone': phone?.trim(),
+      'school': school.trim(),
+      'department': department.trim(),
+      'level': level.trim(),
+      'password': password, // Note: Should be hashed before storage
+      'role': role.trim(),
     };
   }
 

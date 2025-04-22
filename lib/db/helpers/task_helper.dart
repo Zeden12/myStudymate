@@ -8,7 +8,27 @@ class TaskHelper {
 
   Future<int> insertTask(Task task) async {
     final db = await dbHelper.database;
-    return await db.insert('tasks', task.toMap());
+    final taskId = await db.insert('tasks', task.toMap());
+    
+    // Notify students when a task is assigned
+    if (task.isAssigned && 
+        task.assignedSchool != null && 
+        task.assignedDepartment != null && 
+        task.assignedLevel != null) {
+      final students = await dbHelper.userHelper.getStudentsByCriteria(
+        task.assignedSchool!,
+        task.assignedDepartment!,
+        task.assignedLevel!,
+      );
+      
+      await dbHelper.notificationHelper.createAssignmentNotifications(
+        taskId,
+        task.title,
+        students,
+      );
+    }
+    
+    return taskId;
   }
 
   Future<List<Task>> getPersonalTasks(int userId) async {
@@ -22,16 +42,16 @@ class TaskHelper {
     return result.map((map) => Task.fromMap(map)).toList();
   }
 
-  Future<List<Task>> getAssignedTasks(int userId, String school, String department, String level) async {
-    final db = await dbHelper.database;
-    final result = await db.query(
-      'tasks',
-      where: 'isAssigned = 1 AND assignedSchool = ? AND assignedDepartment = ? AND assignedLevel = ?',
-      whereArgs: [school, department, level],
-      orderBy: 'deadline ASC',
-    );
-    return result.map((map) => Task.fromMap(map)).toList();
-  }
+  Future<List<Task>> getAssignedTasks(String school, String department, String level) async {
+  final db = await dbHelper.database;
+  final result = await db.query(
+    'tasks',
+    where: 'isAssigned = 1 AND assignedSchool = ? AND assignedDepartment = ? AND assignedLevel = ?',
+    whereArgs: [school.trim(), department.trim(), level.trim()],
+    orderBy: 'deadline ASC',
+  );
+  return result.map((map) => Task.fromMap(map)).toList();
+}
 
   Future<List<Task>> getAssignedTasksByLecturer(int userId) async {
     final db = await dbHelper.database;
@@ -86,28 +106,26 @@ class TaskHelper {
   }
 
   Future<int> toggleTaskCompletion(int id, bool isCompleted) async {
-  final db = await dbHelper.database;
-
-  if (isCompleted) {
-    final taskData = await db.query('tasks', where: 'id = ?', whereArgs: [id]);
-    final userId = taskData.isNotEmpty ? taskData[0]['userId'] as int : null;
-
-    if (userId != null) {
-      await db.insert('task_completions', {
-        'taskId': id,
-        'userId': userId,
-        'completedAt': DateTime.now().toIso8601String(),
-      });
+    final db = await dbHelper.database;
+    if (isCompleted) {
+      final taskData = await db.query('tasks', where: 'id = ?', whereArgs: [id]);
+      final userId = taskData.isNotEmpty ? taskData[0]['userId'] as int : null;
+      
+      if (userId != null) {
+        await db.insert('task_completions', {
+          'taskId': id,
+          'userId': userId,
+          'completedAt': DateTime.now().toIso8601String(),
+        });
+      }
     }
+    return await db.update(
+      'tasks',
+      {'isCompleted': isCompleted ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
-
-  return await db.update(
-    'tasks',
-    {'isCompleted': isCompleted ? 1 : 0},
-    where: 'id = ?',
-    whereArgs: [id],
-  );
-}
 
   Future<List<Map<String, dynamic>>> getTaskCompletions(int taskId) async {
     final db = await dbHelper.database;

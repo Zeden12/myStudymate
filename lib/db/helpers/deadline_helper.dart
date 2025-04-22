@@ -37,7 +37,7 @@ class DeadlineHelper {
             taskId: task.id!,
             message: 'Task "${task.title}" is due in less than 1 hour!',
             isRead: false,
-            createdAt: DateTime.now().toIso8601String(), // 👈 Fix here
+            createdAt: DateTime.now(), // 👈 Fix here
           ),
         );
       }

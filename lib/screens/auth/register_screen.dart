@@ -16,9 +16,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _schoolController = TextEditingController();
-  final _departmentController = TextEditingController();
-  final _levelController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -27,9 +24,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _selectedRole = 'student';
   bool _isLoading = false;
 
-  final List<String> _schools = ['school of ICT','School of Engineering', 'School of science', 'School of Mining & Geology', 'School of Architecture'];
-  final List<String> _departments = ['IS','CS', 'IT', 'CSE', 'SE', 'CE', 'EE', 'ME', 'AE', 'CEG', 'CIVIL', 'ARCHITECTURE'];
+  // Updated to exactly match task assignment dropdowns
+  final List<String> _schools = [
+    'School of ICT',
+    'School of Engineering',
+    'School of Science',
+  ];
+  final List<String> _departments = ['IS', 'CS', 'IT', 'CSE'];
   final List<String> _levels = ['1', '2', '3', '4'];
+
+  String _selectedSchool = 'School of ICT';
+  String _selectedDepartment = 'IS';
+  String _selectedLevel = '1';
 
   @override
   void initState() {
@@ -56,82 +62,130 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Center(
                   child: Text(
                     'Join StudyMate & Stay Ahead! 🎓',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green[800]),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green[800],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Personal Information
                 _buildSectionHeader('Personal Information'),
-                _buildTextField(_fullNameController, 'Full Name', validator: _requiredValidator),
+                _buildTextField(
+                  _fullNameController,
+                  'Full Name',
+                  validator: _requiredValidator,
+                ),
                 const SizedBox(height: 16),
-                _buildTextField(_emailController, 'Email', keyboardType: TextInputType.emailAddress, validator: _emailValidator),
+                _buildTextField(
+                  _emailController,
+                  'Email',
+                  keyboardType: TextInputType.emailAddress,
+                  validator: _emailValidator,
+                ),
                 const SizedBox(height: 16),
-                _buildTextField(_phoneController, 'Phone (optional)', keyboardType: TextInputType.phone),
+                _buildTextField(
+                  _phoneController,
+                  'Phone (optional)',
+                  keyboardType: TextInputType.phone,
+                ),
 
                 const SizedBox(height: 24),
+
+                // Education & Role
                 _buildSectionHeader('Education & Role'),
                 _buildDropdownField(
                   label: 'Role',
                   value: _selectedRole,
-                  items: ['student', 'lecturer'],
+                  items: const ['student', 'lecturer'],
                   onChanged: (value) => setState(() => _selectedRole = value!),
                 ),
                 const SizedBox(height: 16),
                 _buildDropdownField(
                   label: 'School',
-                  value: _schools.first,
+                  value: _selectedSchool,
                   items: _schools,
-                  onChanged: (value) => _schoolController.text = value!,
+                  onChanged:
+                      (value) => setState(() => _selectedSchool = value!),
                 ),
                 const SizedBox(height: 16),
                 _buildDropdownField(
                   label: 'Department',
-                  value: _departments.first,
+                  value: _selectedDepartment,
                   items: _departments,
-                  onChanged: (value) => _departmentController.text = value!,
+                  onChanged:
+                      (value) => setState(() => _selectedDepartment = value!),
                 ),
                 const SizedBox(height: 16),
                 if (_selectedRole == 'student')
                   _buildDropdownField(
                     label: 'Level',
-                    value: _levels.first,
+                    value: _selectedLevel,
                     items: _levels,
-                    onChanged: (value) => _levelController.text = value!,
+                    onChanged:
+                        (value) => setState(() => _selectedLevel = value!),
                     itemLabelBuilder: (val) => 'Level $val',
                   ),
 
                 const SizedBox(height: 24),
+
+                // Security
                 _buildSectionHeader('Security'),
-                _buildTextField(_passwordController, 'Password', obscureText: true, validator: _passwordValidator),
+                _buildTextField(
+                  _passwordController,
+                  'Password',
+                  obscureText: true,
+                  validator: _passwordValidator,
+                ),
                 const SizedBox(height: 16),
-                _buildTextField(_confirmPasswordController, 'Confirm Password', obscureText: true, validator: _confirmPasswordValidator),
+                _buildTextField(
+                  _confirmPasswordController,
+                  'Confirm Password',
+                  obscureText: true,
+                  validator: _confirmPasswordValidator,
+                ),
 
                 const SizedBox(height: 32),
+
+                // Register Button
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[700],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[700],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          onPressed: _register,
-                          child: const Text('Register', style: TextStyle(fontSize: 18, color: Colors.white)),
+                        ),
+                        onPressed: _register,
+                        child: const Text(
+                          'Register',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
+                    ),
                 const SizedBox(height: 16),
+
+                // Login Link
                 Center(
                   child: TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
                       );
                     },
-                    child: Text('Already have an account? Login', style: TextStyle(color: Colors.green[700])),
+                    child: Text(
+                      'Already have an account? Login',
+                      style: TextStyle(color: Colors.green[700]),
+                    ),
                   ),
                 ),
               ],
@@ -147,7 +201,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         title,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.green[800]),
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.green[800],
+        ),
       ),
     );
   }
@@ -182,12 +240,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }) {
     return DropdownButtonFormField<String>(
       value: value,
-      items: items.map((item) {
-        return DropdownMenuItem<String>(
-          value: item,
-          child: Text(itemLabelBuilder?.call(item) ?? item),
-        );
-      }).toList(),
+      items:
+          items.map((item) {
+            return DropdownMenuItem<String>(
+              value: item,
+              child: Text(itemLabelBuilder?.call(item) ?? item),
+            );
+          }).toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
@@ -225,13 +284,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() => _isLoading = true);
 
       final user = User(
-        fullName: _fullNameController.text,
-        email: _emailController.text,
-        phone: _phoneController.text,
-        school: _schoolController.text,
-        department: _departmentController.text,
-        level: _levelController.text,
-        password: _passwordController.text,
+        fullName: _fullNameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        school: _selectedSchool.trim(),
+        department: _selectedDepartment.trim(),
+        level: _selectedLevel.trim(),
+        password: _passwordController.text.trim(),
         role: _selectedRole,
       );
 
@@ -268,9 +327,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _fullNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _schoolController.dispose();
-    _departmentController.dispose();
-    _levelController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();

@@ -22,7 +22,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2, // Updated version
+      version: 2,
       onCreate: _createDB,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
@@ -30,7 +30,7 @@ class DatabaseHelper {
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute('''
-            CREATE TABLE IF NOT EXISTS task_completions (
+            CREATE TABLE task_completions (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               taskId INTEGER NOT NULL,
               userId INTEGER NOT NULL,
@@ -48,7 +48,7 @@ class DatabaseHelper {
     final batch = db.batch();
     
     batch.execute('''
-      CREATE TABLE IF NOT EXISTS users (
+      CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         fullName TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
@@ -62,7 +62,7 @@ class DatabaseHelper {
     ''');
 
     batch.execute('''
-      CREATE TABLE IF NOT EXISTS tasks (
+      CREATE TABLE tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userId INTEGER NOT NULL,
         title TEXT NOT NULL,
@@ -75,11 +75,12 @@ class DatabaseHelper {
         assignedSchool TEXT,
         assignedDepartment TEXT,
         assignedLevel TEXT,
-        FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE)
+        FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+      )
     ''');
 
     batch.execute('''
-      CREATE TABLE IF NOT EXISTS notifications (
+      CREATE TABLE notifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userId INTEGER NOT NULL,
         taskId INTEGER NOT NULL,
@@ -87,11 +88,12 @@ class DatabaseHelper {
         isRead INTEGER DEFAULT 0,
         createdAt TEXT NOT NULL,
         FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
-        FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE)
+        FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE
+      )
     ''');
 
     batch.execute('''
-      CREATE TABLE IF NOT EXISTS task_completions (
+      CREATE TABLE task_completions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         taskId INTEGER NOT NULL,
         userId INTEGER NOT NULL,
