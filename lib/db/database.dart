@@ -45,6 +45,7 @@ class DatabaseHelper {
         level TEXT NOT NULL,
         password TEXT NOT NULL,
         role TEXT NOT NULL CHECK(role IN ('student', 'lecturer'))
+      )
     ''');
 
     batch.execute('''
