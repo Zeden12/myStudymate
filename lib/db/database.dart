@@ -22,16 +22,29 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Updated version
       onCreate: _createDB,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS task_completions (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              taskId INTEGER NOT NULL,
+              userId INTEGER NOT NULL,
+              completedAt TEXT NOT NULL,
+              FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE,
+              FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+            )
+          ''');
+        }
       },
     );
   }
 
   Future _createDB(Database db, int version) async {
-    // Batch execute all table creations
     final batch = db.batch();
     
     batch.execute('''
@@ -75,6 +88,17 @@ class DatabaseHelper {
         createdAt TEXT NOT NULL,
         FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
         FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE)
+    ''');
+
+    batch.execute('''
+      CREATE TABLE IF NOT EXISTS task_completions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        taskId INTEGER NOT NULL,
+        userId INTEGER NOT NULL,
+        completedAt TEXT NOT NULL,
+        FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE,
+        FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+      )
     ''');
 
     await batch.commit();

@@ -1,6 +1,6 @@
+import 'package:mystudymate/db/database.dart';
 import 'package:mystudymate/models/notification_model.dart';
 import 'package:mystudymate/models/user_model.dart';
-import '../database.dart';
 
 class NotificationHelper {
   final DatabaseHelper dbHelper;
