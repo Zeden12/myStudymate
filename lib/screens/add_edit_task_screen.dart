@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mystudymate/models/task_model.dart';
 import 'package:mystudymate/db/helpers/task_helper.dart';
-import 'package:mystudymate/db/helpers/notification_helper.dart';
-import 'package:mystudymate/db/helpers/user_helper.dart';
 import 'package:mystudymate/db/database.dart';
 
 class AddEditTaskScreen extends StatefulWidget {
@@ -72,10 +70,12 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         title: Text(
           widget.task == null 
             ? widget.isAssigned ? 'Create Assignment' : 'Add Task' 
-            : 'Edit ${widget.isAssigned ? 'Assignment' : 'Task'}'
+            : 'Edit ${widget.isAssigned ? 'Assignment' : 'Task'}',
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.green[700],
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -91,14 +91,14 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   validator: (value) => value?.isEmpty ?? true ? 'Please enter a title' : null,
                   onSaved: (value) => _title = value!,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   initialValue: _description,
                   decoration: _inputDecoration('Description (optional)'),
                   maxLines: 3,
                   onSaved: (value) => _description = value ?? '',
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _category,
                   items: const [
@@ -108,13 +108,13 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   decoration: _inputDecoration('Category'),
                   onChanged: (value) => _category = value!,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   initialValue: _module,
                   decoration: _inputDecoration('Module/Course (optional)'),
                   onSaved: (value) => _module = value ?? '',
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ListTile(
                   title: Text(
                     _deadline == null
@@ -124,7 +124,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                   trailing: Icon(Icons.calendar_today, color: Colors.green[700]),
                   onTap: _selectDeadline,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 
                 if (widget.isAssigned) ...[
                   Text(
@@ -135,7 +135,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       color: Colors.green[700],
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: _assignedSchool,
                     items: _schools.map((school) => 
@@ -144,7 +144,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     decoration: _inputDecoration('School'),
                     onChanged: (value) => setState(() => _assignedSchool = value),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: _assignedDepartment,
                     items: _departments.map((dept) => 
@@ -153,7 +153,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     decoration: _inputDecoration('Department'),
                     onChanged: (value) => setState(() => _assignedDepartment = value),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: _assignedLevel,
                     items: _levels.map((level) => 
@@ -162,7 +162,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                     decoration: _inputDecoration('Level'),
                     onChanged: (value) => setState(() => _assignedLevel = value),
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   Text(
                     'This assignment will be visible to all students matching the selected school, department and level.',
                     style: TextStyle(
@@ -170,25 +170,30 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                 ],
                 
                 _isLoading
-                    ? Center(child: CircularProgressIndicator())
+                    ? const Center(child: CircularProgressIndicator())
                     : SizedBox(
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green[700],
+                            foregroundColor: Colors.white, // White text
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
+                            elevation: 2,
                           ),
                           onPressed: _saveTask,
                           child: Text(
                             widget.task == null ? 'Save' : 'Update',
-                            style: TextStyle(fontSize: 18),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold, // Bold for better visibility
+                            ),
                           ),
                         ),
                       ),
@@ -203,9 +208,17 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      border: OutlineInputBorder(),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.green[700]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.green[700]!, width: 2),
+      ),
       filled: true,
       fillColor: Colors.green[50],
+      labelStyle: TextStyle(color: Colors.green[800]),
     );
   }
 
@@ -251,7 +264,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
     if (widget.isAssigned) {
       if (assignedSchool == null || assignedDepartment == null || assignedLevel == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Please select all assignment criteria'),
             backgroundColor: Colors.red,
           ),
@@ -297,7 +310,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
       );
 
       widget.onTaskSaved();
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -306,7 +319,7 @@ class _AddEditTaskScreenState extends State<AddEditTaskScreen> {
         ),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 }

@@ -24,7 +24,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _selectedRole = 'student';
   bool _isLoading = false;
 
-  // Updated to exactly match task assignment dropdowns
   final List<String> _schools = [
     'School of ICT',
     'School of Engineering',
@@ -48,7 +47,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('StudyMate Pro - Register'),
+        title: const Text(
+          'StudyMate Pro - Register',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.green[700],
       ),
       body: SafeArea(
@@ -107,16 +109,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: 'School',
                   value: _selectedSchool,
                   items: _schools,
-                  onChanged:
-                      (value) => setState(() => _selectedSchool = value!),
+                  onChanged: (value) => setState(() => _selectedSchool = value!),
                 ),
                 const SizedBox(height: 16),
                 _buildDropdownField(
                   label: 'Department',
                   value: _selectedDepartment,
                   items: _departments,
-                  onChanged:
-                      (value) => setState(() => _selectedDepartment = value!),
+                  onChanged: (value) => setState(() => _selectedDepartment = value!),
                 ),
                 const SizedBox(height: 16),
                 if (_selectedRole == 'student')
@@ -124,8 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     label: 'Level',
                     value: _selectedLevel,
                     items: _levels,
-                    onChanged:
-                        (value) => setState(() => _selectedLevel = value!),
+                    onChanged: (value) => setState(() => _selectedLevel = value!),
                     itemLabelBuilder: (val) => 'Level $val',
                   ),
 
@@ -153,22 +152,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[700],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[700],
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: _register,
+                          child: const Text(
+                            'Register',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        onPressed: _register,
-                        child: const Text(
-                          'Register',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
                       ),
-                    ),
                 const SizedBox(height: 16),
 
                 // Login Link
@@ -184,7 +187,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     child: Text(
                       'Already have an account? Login',
-                      style: TextStyle(color: Colors.green[700]),
+                      style: TextStyle(
+                        color: Colors.green[700],
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -225,7 +231,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
         labelText: label,
         filled: true,
         fillColor: Colors.green[50],
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.green[700]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.green[700]!, width: 2),
+        ),
+        labelStyle: TextStyle(color: Colors.green[800]),
+        prefixIcon: Icon(
+          label.contains('Email') ? Icons.email_outlined : 
+          label.contains('Password') ? Icons.lock_outline :
+          label.contains('Phone') ? Icons.phone : Icons.person,
+          color: Colors.green[700],
+        ),
       ),
       validator: validator,
     );
@@ -240,20 +260,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }) {
     return DropdownButtonFormField<String>(
       value: value,
-      items:
-          items.map((item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(itemLabelBuilder?.call(item) ?? item),
-            );
-          }).toList(),
+      items: items.map((item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(
+            itemLabelBuilder?.call(item) ?? item,
+            style: TextStyle(color: Colors.green[800]),
+          ),
+        );
+      }).toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
         filled: true,
         fillColor: Colors.green[50],
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.green[700]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.green[700]!, width: 2),
+        ),
+        labelStyle: TextStyle(color: Colors.green[800]),
       ),
+      dropdownColor: Colors.green[50],
+      icon: Icon(Icons.arrow_drop_down, color: Colors.green[700]),
     );
   }
 
@@ -332,3 +364,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 }
+//       title: const Text('Register'),
