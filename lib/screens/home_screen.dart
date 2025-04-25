@@ -5,8 +5,7 @@ import 'package:mystudymate/db/helpers/deadline_helper.dart';
 import 'package:mystudymate/db/database.dart';
 import 'package:mystudymate/models/task_model.dart';
 import 'package:mystudymate/models/user_model.dart';
-import 'package:mystudymate/models/notification_model.dart'
-    as CustomNotification;
+import 'package:mystudymate/models/notification_model.dart' as CustomNotification;
 import 'package:mystudymate/screens/add_edit_task_screen.dart';
 import 'package:mystudymate/screens/auth/login_screen.dart';
 import 'package:mystudymate/screens/notification_screen.dart';
@@ -20,8 +19,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TaskHelper _taskHelper;
   late NotificationHelper _notificationHelper;
   late DeadlineHelper _deadlineHelper;
@@ -40,10 +38,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _taskHelper = TaskHelper(DatabaseHelper.instance);
     _notificationHelper = NotificationHelper(DatabaseHelper.instance);
-    _deadlineHelper = DeadlineHelper(
-      DatabaseHelper.instance,
-      _notificationHelper,
-    );
+    _deadlineHelper = DeadlineHelper(DatabaseHelper.instance, _notificationHelper);
     _tabController = TabController(
       length: widget.user.role == 'student' ? 4 : 4,
       vsync: this,
@@ -57,24 +52,14 @@ class _HomeScreenState extends State<HomeScreen>
 
     if (widget.user.role == 'student') {
       _personalTasks = await _taskHelper.getPersonalTasks(widget.user.id!);
-      _assignedTasks = await _taskHelper.getAssignedTasks(
-        widget.user.school,
-        widget.user.department,
-        widget.user.level,
-      );
+      _assignedTasks = await _taskHelper.getAssignedTasksForStudent(widget.user.id!);
       _completedTasks = await _taskHelper.getCompletedTasks(widget.user.id!);
     } else {
-      _lecturerTasks = await _taskHelper.getAssignedTasksByLecturer(
-        widget.user.id!,
-      );
-      _completedLecturerTasks = await _taskHelper.getCompletedTasks(
-        widget.user.id!,
-      );
+      _lecturerTasks = await _taskHelper.getAssignedTasksByLecturer(widget.user.id!);
+      _completedLecturerTasks = await _taskHelper.getCompletedTasks(widget.user.id!);
     }
 
-    _notifications = await _notificationHelper.getNotificationsByUser(
-      widget.user.id!,
-    );
+    _notifications = await _notificationHelper.getNotificationsByUser(widget.user.id!);
     _unreadNotifications = _notifications.where((n) => !n.isRead).length;
 
     setState(() => _isLoading = false);
@@ -89,18 +74,13 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'StudyMate Pro - ${widget.user.role == 'student' ? 'Student' : 'Lecturer'}',
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.green[700],
         elevation: 0,
@@ -113,9 +93,7 @@ class _HomeScreenState extends State<HomeScreen>
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) =>
-                              NotificationScreen(userId: widget.user.id!),
+                      builder: (context) => NotificationScreen(userId: widget.user.id!),
                     ),
                   );
                   _loadData();
@@ -159,69 +137,55 @@ class _HomeScreenState extends State<HomeScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white.withOpacity(0.7),
           indicatorColor: Colors.white,
-          tabs:
-              widget.user.role == 'student'
-                  ? [
-                    const Tab(icon: Icon(Icons.home), text: 'Home'),
-                    const Tab(icon: Icon(Icons.assignment), text: 'My Tasks'),
-                    const Tab(icon: Icon(Icons.school), text: 'Assigned'),
-                    const Tab(
-                      icon: Icon(Icons.check_circle),
-                      text: 'Completed',
-                    ),
-                  ]
-                  : [
-                    const Tab(icon: Icon(Icons.home), text: 'Home'),
-                    const Tab(icon: Icon(Icons.add_task), text: 'Create'),
-                    const Tab(
-                      icon: Icon(Icons.assignment),
-                      text: 'Assignments',
-                    ),
-              
-                    const Tab(
-                      icon: Icon(Icons.check_circle),
-                      text: 'Completed',
-                    ),
-                  ],
+          tabs: widget.user.role == 'student'
+              ? [
+                  const Tab(icon: Icon(Icons.home), text: 'Home'),
+                  const Tab(icon: Icon(Icons.assignment), text: 'My Tasks'),
+                  const Tab(icon: Icon(Icons.school), text: 'Assigned'),
+                  const Tab(icon: Icon(Icons.check_circle), text: 'Completed'),
+                ]
+              : [
+                  const Tab(icon: Icon(Icons.home), text: 'Home'),
+                  const Tab(icon: Icon(Icons.add_task), text: 'Assignments'),
+                  const Tab(icon: Icon(Icons.assignment), text: 'Create Assignment'),
+                  const Tab(icon: Icon(Icons.check_circle), text: 'Completed'),
+                ],
         ),
       ),
-      floatingActionButton:
-          widget.user.role == 'student' || _tabController.index != 2
-              ? FloatingActionButton(
-                backgroundColor: Colors.green[700],
-                child: const Icon(Icons.add),
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => AddEditTaskScreen(
-                            userId: widget.user.id!,
-                            isAssigned: false,
-                            onTaskSaved: _loadData,
-                          ),
+      floatingActionButton: widget.user.role == 'student' || _tabController.index != 2
+          ? FloatingActionButton(
+              backgroundColor: Colors.green[700],
+              child: const Icon(Icons.add),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddEditTaskScreen(
+                      userId: widget.user.id!,
+                      isAssigned: false,
+                      onTaskSaved: _loadData,
                     ),
-                  );
-                  _loadData();
-                },
-              )
-              : null,
+                  ),
+                );
+                _loadData();
+              },
+            )
+          : null,
       body: TabBarView(
         controller: _tabController,
-        children:
-            widget.user.role == 'student'
-                ? [
-                  _buildStudentHome(),
-                  _buildTaskList(_personalTasks, false),
-                  _buildTaskList(_assignedTasks, true),
-                  _buildCompletedTaskList(_completedTasks),
-                ]
-                : [
-                  _buildLecturerHome(),
-                  _buildTaskList(_lecturerTasks, true),
-                  _buildAssignmentCreation(),
-                  _buildCompletedTaskList(_completedLecturerTasks),
-                ],
+        children: widget.user.role == 'student'
+            ? [
+                _buildStudentHome(),
+                _buildTaskList(_personalTasks, false),
+                _buildTaskList(_assignedTasks, true),
+                _buildCompletedTaskList(_completedTasks),
+              ]
+            : [
+                _buildLecturerHome(),
+                _buildTaskList(_lecturerTasks, true),
+                _buildAssignmentCreation(),
+                _buildCompletedTaskList(_completedLecturerTasks),
+              ],
       ),
     );
   }
@@ -311,11 +275,7 @@ class _HomeScreenState extends State<HomeScreen>
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.tips_and_updates,
-                        color: Colors.amber[700],
-                        size: 30,
-                      ),
+                      Icon(Icons.tips_and_updates, color: Colors.amber[700], size: 30),
                       const SizedBox(width: 10),
                       Text(
                         'Quick Tips',
@@ -352,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen>
                 const SizedBox(height: 10),
                 ..._assignedTasks
                     .where((task) => task.deadline != null)
-                    .take(3) // Safer than sublist
+                    .take(3)
                     .map(
                       (task) => ListTile(
                         leading: Icon(Icons.assignment, color: Colors.blue),
@@ -404,7 +364,6 @@ class _HomeScreenState extends State<HomeScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title row
                   Row(
                     children: [
                       Icon(Icons.today, color: Colors.green[700], size: 30),
@@ -419,8 +378,6 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ],
                   ),
-
-                  // THIS IS WHERE THE STAT CARDS GO
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -433,13 +390,13 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                       _buildStatCard(
                         'Assigned',
-                        '${_assignedTasks.length}',
+                        '${_lecturerTasks.length}',
                         Icons.school,
                         Colors.orange,
                       ),
                       _buildStatCard(
                         'Completed',
-                        '${_completedTasks.length}',
+                        '${_completedLecturerTasks.length}',
                         Icons.check_circle,
                         Colors.green,
                       ),
@@ -498,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 const SizedBox(height: 10),
                 ..._lecturerTasks
-                    .take(3) // Safer than sublist
+                    .take(3)
                     .map(
                       (task) => ListTile(
                         leading: Icon(Icons.assignment, color: Colors.blue),
@@ -522,12 +479,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildStatCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Column(
       children: [
         Container(
@@ -586,13 +538,19 @@ class _HomeScreenState extends State<HomeScreen>
           task: task,
           isLecturer: widget.user.role == 'lecturer',
           onToggleComplete: (isCompleted) async {
-            await _taskHelper.toggleTaskCompletion(task.id!, isCompleted);
+            await _taskHelper.toggleTaskCompletion(
+              task.id!,
+              widget.user.id!,
+              isCompleted,
+            );
             if (isCompleted) {
               await _notificationHelper.createNotification(
                 CustomNotification.Notification(
                   userId: widget.user.id!,
                   taskId: task.id!,
-                  message: 'You completed task: ${task.title}',
+                  message: widget.user.role == 'student'
+                      ? 'You completed task: ${task.title}'
+                      : 'Task marked as completed: ${task.title}',
                   isRead: false,
                   createdAt: DateTime.now(),
                 ),
@@ -604,13 +562,12 @@ class _HomeScreenState extends State<HomeScreen>
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (context) => AddEditTaskScreen(
-                      userId: widget.user.id!,
-                      task: task,
-                      isAssigned: task.isAssigned,
-                      onTaskSaved: _loadData,
-                    ),
+                builder: (context) => AddEditTaskScreen(
+                  userId: widget.user.id!,
+                  task: task,
+                  isAssigned: task.isAssigned,
+                  onTaskSaved: _loadData,
+                ),
               ),
             );
             _loadData();
@@ -642,11 +599,31 @@ class _HomeScreenState extends State<HomeScreen>
           isLecturer: widget.user.role == 'lecturer',
           isCompleted: true,
           onToggleComplete: (isCompleted) async {
-            await _taskHelper.toggleTaskCompletion(task.id!, isCompleted);
+            await _taskHelper.toggleTaskCompletion(
+              task.id!,
+              widget.user.id!,
+              isCompleted,
+            );
             _loadData();
           },
-          onEdit: null,
-          onDelete: null,
+          onEdit: widget.user.role == 'lecturer' ? () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddEditTaskScreen(
+                  userId: widget.user.id!,
+                  task: task,
+                  isAssigned: task.isAssigned,
+                  onTaskSaved: _loadData,
+                ),
+              ),
+            );
+            _loadData();
+          } : null,
+          onDelete: widget.user.role == 'lecturer' ? () async {
+            await _taskHelper.deleteTask(task.id!);
+            _loadData();
+          } : null,
         );
       },
     );
@@ -677,8 +654,12 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Assign tasks to students by selecting their school, department, and level. All matching students will be notified.',
-                    style: TextStyle(color: Colors.grey[600]),
+                    'Assign tasks to students by selecting their school, '
+                    'department, and level. All matching students will be notified.',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
@@ -687,6 +668,7 @@ class _HomeScreenState extends State<HomeScreen>
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green[700],
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -695,12 +677,11 @@ class _HomeScreenState extends State<HomeScreen>
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => AddEditTaskScreen(
-                                  userId: widget.user.id!,
-                                  isAssigned: true,
-                                  onTaskSaved: _loadData,
-                                ),
+                            builder: (context) => AddEditTaskScreen(
+                              userId: widget.user.id!,
+                              isAssigned: true,
+                              onTaskSaved: _loadData,
+                            ),
                           ),
                         );
                         _loadData();
@@ -715,6 +696,30 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
+          const SizedBox(height: 20),
+          if (_lecturerTasks.isNotEmpty)
+            Text(
+              'Recent Assignments',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[700],
+              ),
+            ),
+          if (_lecturerTasks.isNotEmpty)
+            ..._lecturerTasks.take(3).map((task) => ListTile(
+                  leading: const Icon(Icons.assignment, color: Colors.blue),
+                  title: Text(task.title),
+                  subtitle: Text(
+                    task.deadline != null
+                        ? 'Due: ${task.deadline!.day}/${task.deadline!.month}/${task.deadline!.year}'
+                        : 'No deadline',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    _tabController.index = 1;
+                  },
+                )),
         ],
       ),
     );
@@ -764,27 +769,23 @@ class TaskCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      decoration:
-                          task.isCompleted
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
+                      decoration: task.isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
                     ),
                   ),
                 ),
                 if (!isCompleted && onEdit != null && onDelete != null)
                   PopupMenuButton(
-                    icon: Icon(Icons.more_vert, color: Colors.grey),
-                    itemBuilder:
-                        (context) => [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Text('Edit'),
-                          ),
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Delete'),
-                          ),
-                        ],
+                    icon: const Icon(Icons.more_vert, color: Colors.grey),
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: Text('Edit'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete'),
+                      ),
+                    ],
                     onSelected: (value) {
                       if (value == 'edit') onEdit!();
                       if (value == 'delete') onDelete!();
@@ -811,7 +812,7 @@ class TaskCard extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                  const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
                   Text(
                     '${task.deadline!.day}/${task.deadline!.month}/${task.deadline!.year}',
@@ -831,15 +832,9 @@ class TaskCard extends StatelessWidget {
               children: [
                 Chip(
                   label: Text(task.category),
-                  backgroundColor:
-                      task.category == 'group'
-                          ? Colors.green[100]
-                          : Colors.purple[100],
+                  backgroundColor: task.category == 'group' ? Colors.green[100] : Colors.purple[100],
                   labelStyle: TextStyle(
-                    color:
-                        task.category == 'group'
-                            ? Colors.green[800]
-                            : Colors.purple[800],
+                    color: task.category == 'group' ? Colors.green[800] : Colors.purple[800],
                   ),
                 ),
                 if (task.isAssigned)
@@ -871,6 +866,12 @@ class TaskCard extends StatelessWidget {
                     label: const Text('Completed'),
                     backgroundColor: Colors.grey[200],
                     labelStyle: TextStyle(color: Colors.grey[800]),
+                  ),
+                if (task.isCompletedByMe)
+                  Chip(
+                    label: const Text('Completed by you'),
+                    backgroundColor: Colors.green[100],
+                    labelStyle: TextStyle(color: Colors.green[800]),
                   ),
               ],
             ),

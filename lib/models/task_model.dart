@@ -3,14 +3,16 @@ class Task {
   final int userId;
   final String title;
   final String? description;
-  final String category; // Consider enum if limited options
+  final String category;
   final String? module;
   final DateTime? deadline;
   final bool isCompleted;
+  final DateTime? completedAt;
   final bool isAssigned;
   final String? assignedSchool;
   final String? assignedDepartment;
   final String? assignedLevel;
+  final bool isCompletedByMe; // New field for student perspective
 
   Task({
     this.id,
@@ -21,13 +23,14 @@ class Task {
     this.module,
     this.deadline,
     this.isCompleted = false,
+    this.completedAt,
     this.isAssigned = false,
     this.assignedSchool,
     this.assignedDepartment,
     this.assignedLevel,
+    this.isCompletedByMe = false, // Default to false
   });
 
-  // Add copyWith for immutable updates
   Task copyWith({
     int? id,
     int? userId,
@@ -37,10 +40,12 @@ class Task {
     String? module,
     DateTime? deadline,
     bool? isCompleted,
+    DateTime? completedAt,
     bool? isAssigned,
     String? assignedSchool,
     String? assignedDepartment,
     String? assignedLevel,
+    bool? isCompletedByMe,
   }) {
     return Task(
       id: id ?? this.id,
@@ -51,10 +56,12 @@ class Task {
       module: module ?? this.module,
       deadline: deadline ?? this.deadline,
       isCompleted: isCompleted ?? this.isCompleted,
+      completedAt: completedAt ?? this.completedAt,
       isAssigned: isAssigned ?? this.isAssigned,
       assignedSchool: assignedSchool ?? this.assignedSchool,
       assignedDepartment: assignedDepartment ?? this.assignedDepartment,
       assignedLevel: assignedLevel ?? this.assignedLevel,
+      isCompletedByMe: isCompletedByMe ?? this.isCompletedByMe,
     );
   }
 
@@ -68,10 +75,12 @@ class Task {
       'module': module?.trim(),
       'deadline': deadline?.toIso8601String(),
       'isCompleted': isCompleted ? 1 : 0,
+      'completedAt': completedAt?.toIso8601String(),
       'isAssigned': isAssigned ? 1 : 0,
       'assignedSchool': assignedSchool?.trim(),
       'assignedDepartment': assignedDepartment?.trim(),
       'assignedLevel': assignedLevel?.trim(),
+      // Note: isCompletedByMe is not stored in the database, it's only for UI
     };
   }
 
@@ -85,10 +94,17 @@ class Task {
       module: map['module'],
       deadline: map['deadline'] != null ? DateTime.parse(map['deadline']) : null,
       isCompleted: map['isCompleted'] == 1,
+      completedAt: map['completedAt'] != null ? DateTime.parse(map['completedAt']) : null,
       isAssigned: map['isAssigned'] == 1,
       assignedSchool: map['assignedSchool'],
       assignedDepartment: map['assignedDepartment'],
       assignedLevel: map['assignedLevel'],
+      isCompletedByMe: map['isCompletedByMe'] == 1, // Added this line
     );
+  }
+
+  @override
+  String toString() {
+    return 'Task(id: $id, title: $title, isCompleted: $isCompleted, isCompletedByMe: $isCompletedByMe)';
   }
 }

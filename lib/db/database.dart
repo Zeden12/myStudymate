@@ -22,31 +22,19 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3, // Incremented version number
       onCreate: _createDB,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
-      onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
-          await db.execute('''
-            CREATE TABLE task_completions (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              taskId INTEGER NOT NULL,
-              userId INTEGER NOT NULL,
-              completedAt TEXT NOT NULL,
-              FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE,
-              FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
-            )
-          ''');
-        }
-      },
+      onUpgrade: _upgradeDB,
     );
   }
 
   Future _createDB(Database db, int version) async {
     final batch = db.batch();
     
+    // Users table
     batch.execute('''
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,6 +49,7 @@ class DatabaseHelper {
       )
     ''');
 
+    // Tasks table with completedAt column
     batch.execute('''
       CREATE TABLE tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,6 +60,7 @@ class DatabaseHelper {
         module TEXT,
         deadline TEXT,
         isCompleted INTEGER DEFAULT 0,
+        completedAt TEXT,
         isAssigned INTEGER DEFAULT 0,
         assignedSchool TEXT,
         assignedDepartment TEXT,
@@ -79,19 +69,21 @@ class DatabaseHelper {
       )
     ''');
 
+    // Notifications table
     batch.execute('''
       CREATE TABLE notifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userId INTEGER NOT NULL,
-        taskId INTEGER NOT NULL,
+        taskId INTEGER,
         message TEXT NOT NULL,
         isRead INTEGER DEFAULT 0,
         createdAt TEXT NOT NULL,
         FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
-        FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE
+        FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE SET NULL
       )
     ''');
 
+    // Task completions table
     batch.execute('''
       CREATE TABLE task_completions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -106,11 +98,37 @@ class DatabaseHelper {
     await batch.commit();
   }
 
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE task_completions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          taskId INTEGER NOT NULL,
+          userId INTEGER NOT NULL,
+          completedAt TEXT NOT NULL,
+          FOREIGN KEY (taskId) REFERENCES tasks (id) ON DELETE CASCADE,
+          FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+        )
+      ''');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE tasks ADD COLUMN completedAt TEXT');
+    }
+  }
+
+  Future<void> debugResetDatabase() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'studymate_pro.db');
+    await deleteDatabase(path);
+    _database = null;
+  }
+
   Future close() async {
     final db = await instance.database;
     db.close();
   }
 
+  // Helper getters
   UserHelper get userHelper => UserHelper(this);
   TaskHelper get taskHelper => TaskHelper(this);
   NotificationHelper get notificationHelper => NotificationHelper(this);
