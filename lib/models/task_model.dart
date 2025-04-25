@@ -12,7 +12,7 @@ class Task {
   final String? assignedSchool;
   final String? assignedDepartment;
   final String? assignedLevel;
-  final bool isCompletedByMe; // New field for student perspective
+  final bool isCompletedByMe;
 
   Task({
     this.id,
@@ -28,7 +28,7 @@ class Task {
     this.assignedSchool,
     this.assignedDepartment,
     this.assignedLevel,
-    this.isCompletedByMe = false, // Default to false
+    this.isCompletedByMe = false,
   });
 
   Task copyWith({
@@ -80,7 +80,6 @@ class Task {
       'assignedSchool': assignedSchool?.trim(),
       'assignedDepartment': assignedDepartment?.trim(),
       'assignedLevel': assignedLevel?.trim(),
-      // Note: isCompletedByMe is not stored in the database, it's only for UI
     };
   }
 
@@ -99,7 +98,7 @@ class Task {
       assignedSchool: map['assignedSchool'],
       assignedDepartment: map['assignedDepartment'],
       assignedLevel: map['assignedLevel'],
-      isCompletedByMe: map['isCompletedByMe'] == 1, // Added this line
+      isCompletedByMe: map['isCompletedByMe'] == 1,
     );
   }
 

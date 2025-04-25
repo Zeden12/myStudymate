@@ -22,7 +22,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3, // Incremented version number
+      version: 3,
       onCreate: _createDB,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
@@ -33,8 +33,7 @@ class DatabaseHelper {
 
   Future _createDB(Database db, int version) async {
     final batch = db.batch();
-    
-    // Users table
+
     batch.execute('''
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,7 +48,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Tasks table with completedAt column
     batch.execute('''
       CREATE TABLE tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,7 +67,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Notifications table
     batch.execute('''
       CREATE TABLE notifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,7 +80,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Task completions table
     batch.execute('''
       CREATE TABLE task_completions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -128,7 +124,6 @@ class DatabaseHelper {
     db.close();
   }
 
-  // Helper getters
   UserHelper get userHelper => UserHelper(this);
   TaskHelper get taskHelper => TaskHelper(this);
   NotificationHelper get notificationHelper => NotificationHelper(this);

@@ -341,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Welcome, Professor ${widget.user.fullName.split(' ').last}! 👨‍🏫',
+            'Welcome, Professor ${widget.user.fullName.split(' ').last} 👋!',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,

@@ -7,7 +7,7 @@ class User {
   final String department;
   final String level;
   final String password;
-  final String role; // Consider enum
+  final String role; 
 
   User({
     this.id,
@@ -21,7 +21,6 @@ class User {
     required this.role,
   });
 
-  // Add copyWith
   User copyWith({
     int? id,
     String? fullName,
@@ -55,7 +54,7 @@ class User {
       'school': school.trim(),
       'department': department.trim(),
       'level': level.trim(),
-      'password': password, // Note: Should be hashed before storage
+      'password': password,
       'role': role.trim(),
     };
   }

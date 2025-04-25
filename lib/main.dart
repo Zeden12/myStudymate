@@ -6,7 +6,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   try {
-    await DatabaseHelper.instance.database; // Initialize database
+    await DatabaseHelper.instance.database;
     runApp(const StudyMatePro());
   } catch (e) {
     runApp(

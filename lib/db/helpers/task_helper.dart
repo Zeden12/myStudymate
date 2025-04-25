@@ -122,14 +122,12 @@ class TaskHelper {
   Future<int> deleteTask(int id) async {
     final db = await dbHelper.database;
     try {
-      // Delete completion records first
       await db.delete(
         'task_completions',
         where: 'taskId = ?',
         whereArgs: [id],
       );
-      
-      // Then delete the task
+
       return await db.delete(
         'tasks',
         where: 'id = ?',
@@ -147,14 +145,13 @@ class TaskHelper {
 
     try {
       if (isCompleted) {
-        // Record completion
+
         await db.insert('task_completions', {
           'taskId': taskId,
           'userId': studentId,
           'completedAt': now,
         });
 
-        // Notify lecturer
         final task = await getTaskById(taskId);
         await dbHelper.notificationHelper.createNotification(
           Notification(
@@ -166,15 +163,12 @@ class TaskHelper {
           ),
         );
       } else {
-        // Remove completion record
         await db.delete(
           'task_completions',
           where: 'taskId = ? AND userId = ?',
           whereArgs: [taskId, studentId],
         );
       }
-
-      // Update overall task completion status
       return await _updateTaskCompletionStatus(taskId);
     } catch (e) {
       debugPrint('Error toggling task completion: $e');
@@ -221,7 +215,6 @@ class TaskHelper {
   }
 
   Future<int> _countAssignedStudents(int taskId) async {
-    final db = await dbHelper.database;
     final task = await getTaskById(taskId);
     
     if (task.isAssigned && 

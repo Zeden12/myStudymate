@@ -72,8 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Personal Information
+                
                 _buildSectionHeader('Personal Information'),
                 _buildTextField(
                   _fullNameController,
@@ -96,7 +95,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 const SizedBox(height: 24),
 
-                // Education & Role
                 _buildSectionHeader('Education & Role'),
                 _buildDropdownField(
                   label: 'Role',
@@ -130,7 +128,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 const SizedBox(height: 24),
 
-                // Security
                 _buildSectionHeader('Security'),
                 _buildTextField(
                   _passwordController,
@@ -147,8 +144,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
 
                 const SizedBox(height: 32),
-
-                // Register Button
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : SizedBox(
@@ -174,7 +169,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                 const SizedBox(height: 16),
 
-                // Login Link
                 Center(
                   child: TextButton(
                     onPressed: () {
@@ -364,4 +358,3 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 }
-//       title: const Text('Register'),
